@@ -11,15 +11,22 @@ class GeoNamesSeeder extends Seeder
 {
     public function run()
     {
-        $json = File::get(database_path('data.json'));
+        Country::truncate();
+        State::truncate();
+        City::truncate();
+        
+        $json = File::get(database_path('data/new_data.json'));
         $countries = json_decode($json, true);
+        $countriesData = collect($countries);
 
-        foreach ($countries as $countryData) {
+
+        $countriesData->each(function ($countryData) {
             $country = Country::create([
                 'id' => $countryData['id'],
                 'name' => $countryData['name'],
                 'iso2' => $countryData['iso2'],
                 'iso3' => $countryData['iso3'],
+                'emoji'=> $countryData['emoji'],
                 'phone_code' => $countryData['phonecode']
             ]);
 
@@ -27,6 +34,7 @@ class GeoNamesSeeder extends Seeder
                 $state = State::create([
                     'id' => $stateData['id'],
                     'name' => $stateData['name'],
+                    'internal_code' => $stateData['internal_code'] ?? null,
                     'iso2' => $stateData['state_code'],
                     'country_id' => $country->id
                 ]);
@@ -34,11 +42,12 @@ class GeoNamesSeeder extends Seeder
                 foreach ($stateData['cities'] as $cityData) {
                     City::create([
                         'id' => $cityData['id'],
+                        'postal_code' => $cityData['postal_code'] ?? null,
                         'name' => $cityData['name'],
                         'state_id' => $state->id
                     ]);
                 }
             }
-        }
+        });
     }
 }

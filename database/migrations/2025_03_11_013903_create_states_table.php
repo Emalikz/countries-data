@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('states', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('iso2', 2)->nullable();
-            $table->foreignId('country_id')->constrained()->onDelete('cascade');
+            $table->string('iso2', 10)->nullable();
+            $table->string('internal_code')->nullable();
+            $table->integer('country_id');
             $table->timestamps();
         });
     }
